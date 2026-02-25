@@ -1,0 +1,9 @@
+{
+  "name": "airtable-stripe-invoice",
+  "version": "1.0.0",
+  "description": "Webhook to create Stripe invoices from Airtable",
+  "main": "api/invoice.js",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}
