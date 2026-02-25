@@ -56,21 +56,25 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Create invoice item
+    // Create invoice first (as draft)
+    const invoice = await stripe.invoices.create({
+      customer: customer.id,
+      collection_method: 'send_invoice',
+      days_until_due: 30,
+      auto_advance: false
+    });
+
+    // Add the line item to this specific invoice
     await stripe.invoiceItems.create({
       customer: customer.id,
+      invoice: invoice.id,
       amount: amountInCents,
       currency: 'usd',
       description: 'Services'
     });
 
-    // Create and send invoice
-    const invoice = await stripe.invoices.create({
-      customer: customer.id,
-      auto_advance: true, // Auto-finalize
-      collection_method: 'send_invoice',
-      days_until_due: 30
-    });
+    // Finalize the invoice
+    await stripe.invoices.finalizeInvoice(invoice.id);
 
     // Send the invoice
     const sentInvoice = await stripe.invoices.sendInvoice(invoice.id);
